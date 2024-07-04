@@ -593,7 +593,6 @@ export function ChatActions(props: {
         />
       )}
     </div>
-  );
 }
 
 export function EditMessageModal(props: { onClose: () => void }) {
