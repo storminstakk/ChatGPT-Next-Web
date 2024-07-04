@@ -2,6 +2,7 @@
   "name": "nextchat",
   "private": false,
   "license": "mit",
+  "type": "module",
   "scripts": {
     "mask": "npx tsx app/masks/build.ts",
     "mask:watch": "npx watch 'yarn mask' app/masks",
