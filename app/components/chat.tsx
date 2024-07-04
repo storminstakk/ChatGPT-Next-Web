@@ -1,11 +1,63 @@
 import { useDebouncedCallback } from "use-debounce";
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  Fragment,
-} from "react";
+import React, { useState, useEffect, useMemo, Fragment } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import dynamic from "next/dynamic";
 import Image from 'next/image';
+import { useNavigate } from "react-router-dom";
+
+import {
+  ChatMessage,
+  SubmitKey,
+  useChatStore,
+  BOT_HELLO,
+  createMessage,
+  useAccessStore,
+  Theme,
+  useAppConfig,
+  DEFAULT_TOPIC,
+  ModelType,
+} from "../store";
+import {
+  copyToClipboard,
+  selectOrCopy,
+  autoGrowTextArea,
+  useMobileScreen,
+  getMessageTextContent,
+  getMessageImages,
+  isVisionModel,
+  compressImage,
+} from "../utils";
+import { ChatControllerPool } from "../client/controller";
+import { Prompt, usePromptStore } from "../store/prompt";
+import Locale from "../locales";
+import {
+  List,
+  ListItem,
+  Modal,
+  Selector,
+  showConfirm,
+  showPrompt,
+  showToast,
+} from "./ui-lib";
+import { Avatar } from "./emoji";
+import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
+import { useMaskStore } from "../store/mask";
+import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
+import { prettyObject } from "../utils/format";
+import { ExportMessageModal } from "./exporter";
+import { getClientConfig } from "../config/client";
+import { useAllModels } from "../utils/hooks";
+import { MultimodalContent } from "../client/api";
+import {
+  CHAT_PAGE_SIZE,
+  LAST_INPUT_KEY,
+  Path,
+  REQUEST_TIMEOUT_MS,
+  UNFINISHED_INPUT,
+} from "../constant";
+import { IconButton } from "./button";
+import styles from "./chat.module.scss";
+
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -27,74 +79,12 @@ import EditIcon from "../icons/rename.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CancelIcon from "../icons/cancel.svg";
 import ImageIcon from "../icons/image.svg";
-
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import RobotIcon from "../icons/robot.svg";
-
-import {
-  ChatMessage,
-  SubmitKey,
-  useChatStore,
-  BOT_HELLO,
-  createMessage,
-  useAccessStore,
-  Theme,
-  useAppConfig,
-  DEFAULT_TOPIC,
-  ModelType,
-} from "../store";
-
-import {
-  copyToClipboard,
-  selectOrCopy,
-  autoGrowTextArea,
-  useMobileScreen,
-  getMessageTextContent,
-  getMessageImages,
-  isVisionModel,
-} from "../utils";
-
-import { compressImage } from "@/app/utils/chat";
-
-import dynamic from "next/dynamic";
-
-import { ChatControllerPool } from "../client/controller";
-import { Prompt, usePromptStore } from "../store/prompt";
-import Locale from "../locales";
-
-import { IconButton } from "./button";
-import styles from "./chat.module.scss";
-
-import {
-  List,
-  ListItem,
-  Modal,
-  Selector,
-  showConfirm,
-  showPrompt,
-  showToast,
-} from "./ui-lib";
-import { useNavigate } from "react-router-dom";
-import {
-  CHAT_PAGE_SIZE,
-  LAST_INPUT_KEY,
-  Path,
-  REQUEST_TIMEOUT_MS,
-  UNFINISHED_INPUT,
-} from "../constant";
-import { Avatar } from "./emoji";
-import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
-import { useMaskStore } from "../store/mask";
-import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
-import { prettyObject } from "../utils/format";
-import { ExportMessageModal } from "./exporter";
-import { getClientConfig } from "../config/client";
-import { useAllModels } from "../utils/hooks";
-import { MultimodalContent } from "../client/api";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -595,7 +585,7 @@ export function ChatActions(props: {
     </div>
 }
 
-export function EditMessageModal(props: { onClose: () => void }) {
+export function EditMessageModal(props) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const [messages, setMessages] = useState(session.messages.slice());
@@ -657,7 +647,7 @@ export function EditMessageModal(props: { onClose: () => void }) {
   );
 }
 
-export function DeleteImageButton(props: { deleteImage: () => void }) {
+export function DeleteImageButton(props) {
   return (
     <div className={styles["delete-image"]} onClick={props.deleteImage}>
       <DeleteIcon />
