@@ -1,12 +1,9 @@
 import { useDebouncedCallback } from "use-debounce";
 import React, {
   useState,
-  useRef,
   useEffect,
   useMemo,
-  useCallback,
   Fragment,
-  RefObject,
 } from "react";
 
 import SendWhiteIcon from "../icons/send-white.svg";
@@ -446,6 +443,11 @@ export function ChatActions(props: {
   const couldStop = ChatControllerPool.hasPending();
   const stopAll = () => ChatControllerPool.stopAll();
 
+ // Assuming the required props and utilities are imported
+  const MyComponent = (props) => {
+  const { setAttachImages, setUploading, hitBottom, scrollToBottom, showPromptModal, uploadImage, uploading, showPromptHints } = props;
+  const chatStore = props.chatStore; // Ensure to get chatStore from props or context if needed
+ 
   // switch model
   const currentModel = chatStore.currentSession().mask.modelConfig.model;
   const allModels = useAllModels();
@@ -463,6 +465,7 @@ export function ChatActions(props: {
       return filteredModels;
     }
   }, [allModels]);
+
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
 
@@ -470,16 +473,16 @@ export function ChatActions(props: {
     const show = isVisionModel(currentModel);
     setShowUploadImage(show);
     if (!show) {
-      props.setAttachImages([]);
-      props.setUploading(false);
+      setAttachImages([]);
+      setUploading(false);
     }
 
-    // if current model is not available
+     // if current model is not available
     // switch to first available model
-    const isUnavaliableModel = !models.some((m) => m.name === currentModel);
-    if (isUnavaliableModel && models.length > 0) {
+    const isUnavailableModel = !models.some((m) => m.name === currentModel);
+    if (isUnavailableModel && models.length > 0) {
       // show next model to default model if exist
-      let nextModel: ModelType = (
+      let nextModel = (
         models.find((model) => model.isDefault) || models[0]
       ).name;
       chatStore.updateCurrentSession(
@@ -487,7 +490,7 @@ export function ChatActions(props: {
       );
       showToast(nextModel);
     }
-  }, [chatStore, currentModel, models]);
+  }, [currentModel, models, setAttachImages, setUploading, chatStore]);
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -498,16 +501,16 @@ export function ChatActions(props: {
           icon={<StopIcon />}
         />
       )}
-      {!props.hitBottom && (
+      {!hitBottom && (
         <ChatAction
-          onClick={props.scrollToBottom}
+          onClick={scrollToBottom}
           text={Locale.Chat.InputActions.ToBottom}
           icon={<BottomIcon />}
         />
       )}
-      {props.hitBottom && (
+      {hitBottom && (
         <ChatAction
-          onClick={props.showPromptModal}
+          onClick={showPromptModal}
           text={Locale.Chat.InputActions.Settings}
           icon={<SettingsIcon />}
         />
@@ -515,9 +518,9 @@ export function ChatActions(props: {
 
       {showUploadImage && (
         <ChatAction
-          onClick={props.uploadImage}
+          onClick={uploadImage}
           text={Locale.Chat.InputActions.UploadImage}
-          icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
+          icon={uploading ? <LoadingButtonIcon /> : <ImageIcon />}
         />
       )}
       <ChatAction
@@ -1424,7 +1427,7 @@ function _Chat() {
                       defaultShow={i >= messages.length - 6}
                     />
                     {getMessageImages(message).length == 1 && (
-                      <img
+                      <Image
                         className={styles["chat-message-item-image"]}
                         src={getMessageImages(message)[0]}
                         alt=""
@@ -1441,7 +1444,7 @@ function _Chat() {
                       >
                         {getMessageImages(message).map((image, index) => {
                           return (
-                            <img
+                            <Image
                               className={
                                 styles["chat-message-item-image-multi"]
                               }
