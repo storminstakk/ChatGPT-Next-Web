@@ -5,7 +5,7 @@ import React, {
   useMemo,
   Fragment,
 } from "react";
-
+import Image from 'next/image';
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
