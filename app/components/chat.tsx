@@ -467,7 +467,7 @@ export function ChatActions(props: {
       setUploading(false);
     }
 
-     // if current model is not available
+    // if current model is not available
     // switch to first available model
     const isUnavailableModel = !models.some((m) => m.name === currentModel);
     if (isUnavailableModel && models.length > 0) {
@@ -476,7 +476,7 @@ export function ChatActions(props: {
         models.find((model) => model.isDefault) || models[0]
       ).name;
       chatStore.updateCurrentSession(
-        (session) => (session.mask.modelConfig.model = nextModel),
+        (session) => (session.mask.modelConfig.model = nextModel)
       );
       showToast(nextModel);
     }
@@ -487,21 +487,21 @@ export function ChatActions(props: {
       {couldStop && (
         <ChatAction
           onClick={stopAll}
-          text={Locale.Chat.InputActions.Stop}
+          text="Stop" // Replace with Locale.Chat.InputActions.Stop if necessary
           icon={<StopIcon />}
         />
       )}
       {!hitBottom && (
         <ChatAction
           onClick={scrollToBottom}
-          text={Locale.Chat.InputActions.ToBottom}
+          text="To Bottom" // Replace with Locale.Chat.InputActions.ToBottom if necessary
           icon={<BottomIcon />}
         />
       )}
       {hitBottom && (
         <ChatAction
           onClick={showPromptModal}
-          text={Locale.Chat.InputActions.Settings}
+          text="Settings" // Replace with Locale.Chat.InputActions.Settings if necessary
           icon={<SettingsIcon />}
         />
       )}
@@ -509,13 +509,13 @@ export function ChatActions(props: {
       {showUploadImage && (
         <ChatAction
           onClick={uploadImage}
-          text={Locale.Chat.InputActions.UploadImage}
+          text="Upload Image" // Replace with Locale.Chat.InputActions.UploadImage if necessary
           icon={uploading ? <LoadingButtonIcon /> : <ImageIcon />}
         />
       )}
       <ChatAction
         onClick={nextTheme}
-        text={Locale.Chat.InputActions.Theme[theme]}
+        text={theme === Theme.Auto ? "Auto" : theme === Theme.Light ? "Light" : theme === Theme.Dark ? "Dark" : ""}
         icon={
           <>
             {theme === Theme.Auto ? (
@@ -531,20 +531,20 @@ export function ChatActions(props: {
 
       <ChatAction
         onClick={props.showPromptHints}
-        text={Locale.Chat.InputActions.Prompt}
+        text="Prompt" // Replace with Locale.Chat.InputActions.Prompt if necessary
         icon={<PromptIcon />}
       />
 
       <ChatAction
         onClick={() => {
-          navigate(Path.Masks);
+          navigate("/masks"); // Replace with Path.Masks if necessary
         }}
-        text={Locale.Chat.InputActions.Masks}
+        text="Masks" // Replace with Locale.Chat.InputActions.Masks if necessary
         icon={<MaskIcon />}
       />
 
       <ChatAction
-        text={Locale.Chat.InputActions.Clear}
+        text="Clear" // Replace with Locale.Chat.InputActions.Clear if necessary
         icon={<BreakIcon />}
         onClick={() => {
           chatStore.updateCurrentSession((session) => {
@@ -583,6 +583,7 @@ export function ChatActions(props: {
         />
       )}
     </div>
+  );
 }
 
 export function EditMessageModal(props) {
